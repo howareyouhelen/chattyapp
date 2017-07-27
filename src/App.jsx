@@ -13,20 +13,34 @@ class App extends Component {
     ws.onopen = function(event) {
       console.log("Connected to server!");
     };
-    ws.onmessage = this.receivePost
+    ws.onmessage = this.receivePost;
   }
 
   receivePost(event){
     const postwithId = JSON.parse(event.data);
-    const newPosts = this.state.posts.concat(postwithId);
-    this.setState({posts: newPosts});
+    switch(postwithId.type) {
+      case "incomingMessage":
+        //handle incoming message
+        const newPosts = this.state.posts.concat(postwithId);
+        this.setState({posts: newPosts});
+        break;
+      case "incomingNotification":
+        //handle incoming notification
+        this.setState({notificationContent: postwithId.content})
+        break;
+      default:
+        //show an error in the console if message type is unknown
+        throw new Error("Unkown event type" + postwithId.type);
+    }
+
   }
 
   constructor(props) {
     super(props);
     this.state = {
       currentUser: {name: "Bob"},
-      posts: []
+      posts: [],
+      notificationContent: ""
     };
     this.onNewPost = this.onNewPost.bind(this);
     this.receivePost = this.receivePost.bind(this);
@@ -35,6 +49,7 @@ class App extends Component {
 
   onNewPost(content) {
     const updatedPosts = {
+      type: "postMessage",
       username: this.state.currentUser.name,
       content: content
     };
@@ -43,6 +58,14 @@ class App extends Component {
   }
 
   newUserName(name) {
+    if (!name) {
+      name = "Anonymous"
+    }
+    const updatedUserName = {
+      type: "postNotification",
+      content: `${this.state.currentUser.name} has set their name to ${name}`
+    };
+    ws.send(JSON.stringify(updatedUserName));
     this.setState({currentUser: {name: name}})
   }
 
@@ -54,7 +77,7 @@ class App extends Component {
           <a href="/" className="navbar-brand">Chatty</a>
         </nav>
         <div>
-          <MessageList messages={this.state.posts} />
+          <MessageList messages={this.state.posts} notification={this.state.notificationContent}/>
         </div>
         <div>
           <ChatBar currentUser={ this.state.currentUser } onPost={ this.onNewPost} onUserNameChange={ this.newUserName }/>
