@@ -58,7 +58,6 @@ class App extends Component {
       username: this.state.currentUser.name,
       content: content
     };
-    console.log(JSON.stringify(updatedPosts));
     ws.send(JSON.stringify(updatedPosts));
   }
 

@@ -6,7 +6,6 @@ class MessageList extends Component {
     return (
     <main className="messages">
       {this.props.messages.map((message) => {
-        //write a conditional statement here that returns diffe kind of msg if it's a system message
         return <Message username={message.username} content={message.content} key={message.id}/>
       })}
 
