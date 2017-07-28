@@ -28,6 +28,10 @@ class App extends Component {
         //handle incoming notification
         this.setState({notificationContent: postwithId.content})
         break;
+      case "clientSize":
+        console.log(postwithId.content);
+        this.setState({clientSize: postwithId.content})
+        break;
       default:
         //show an error in the console if message type is unknown
         throw new Error("Unkown event type" + postwithId.type);
@@ -40,7 +44,8 @@ class App extends Component {
     this.state = {
       currentUser: {name: "Bob"},
       posts: [],
-      notificationContent: ""
+      notificationContent: "",
+      clientSize: ""
     };
     this.onNewPost = this.onNewPost.bind(this);
     this.receivePost = this.receivePost.bind(this);
@@ -75,6 +80,7 @@ class App extends Component {
       <div>
         <nav className="navbar">
           <a href="/" className="navbar-brand">Chatty</a>
+          <span className="clientSize"># of user(s) online: {this.state.clientSize}</span>
         </nav>
         <div>
           <MessageList messages={this.state.posts} notification={this.state.notificationContent}/>
